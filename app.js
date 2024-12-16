@@ -4,6 +4,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchResults = document.getElementById('searchResults');
     const chatMessages = document.getElementById('chatMessages');
     const loadingIndicator = document.getElementById('loadingIndicator');
+    const replyingToIndicator = document.getElementById('replyingToIndicator');
+    const cancelReplyButton = document.getElementById('cancelReply');
 
     // Constants
     const TENOR_API_KEY = 'AIzaSyCkJ44bhL93TkK7MeyBUpfEo53FngnI1lU';
@@ -12,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // State
     let searchTimeout = null;
     let isSearching = false;
+    let replyingToMessage = null;
 
     // Utility Functions
     function showLoading() {
@@ -30,6 +33,19 @@ document.addEventListener('DOMContentLoaded', () => {
         errorDiv.textContent = message;
         searchResults.prepend(errorDiv);
         setTimeout(() => errorDiv.remove(), 3000);
+    }
+
+    function setReplyingTo(messageElement) {
+        replyingToMessage = messageElement;
+        replyingToIndicator.classList.remove('hidden');
+        searchInput.placeholder = 'Search for a GIF to reply...';
+        searchInput.focus();
+    }
+
+    function cancelReply() {
+        replyingToMessage = null;
+        replyingToIndicator.classList.add('hidden');
+        searchInput.placeholder = 'Search for a GIF...';
     }
 
     // GIF Search
@@ -78,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Message Handling
-    function sendGif(gif) {
+    function createMessageElement(gif) {
         const messageElement = document.createElement('div');
         messageElement.className = 'message';
 
@@ -93,11 +109,41 @@ document.addEventListener('DOMContentLoaded', () => {
         timestamp.className = 'timestamp';
         timestamp.textContent = new Date().toLocaleTimeString();
 
+        const actions = document.createElement('div');
+        actions.className = 'message-actions';
+
+        const replyButton = document.createElement('button');
+        replyButton.className = 'action-button';
+        replyButton.innerHTML = '<i class="fas fa-reply"></i> Reply';
+        replyButton.addEventListener('click', () => setReplyingTo(messageElement));
+
+        actions.appendChild(replyButton);
         messageInfo.appendChild(timestamp);
+        messageInfo.appendChild(actions);
         messageElement.appendChild(img);
         messageElement.appendChild(messageInfo);
 
-        chatMessages.appendChild(messageElement);
+        return messageElement;
+    }
+
+    function sendGif(gif) {
+        const messageElement = createMessageElement(gif);
+
+        if (replyingToMessage) {
+            let threadContainer = replyingToMessage.querySelector('.thread');
+            
+            if (!threadContainer) {
+                threadContainer = document.createElement('div');
+                threadContainer.className = 'thread';
+                replyingToMessage.appendChild(threadContainer);
+            }
+
+            threadContainer.appendChild(messageElement);
+            cancelReply();
+        } else {
+            chatMessages.appendChild(messageElement);
+        }
+
         chatMessages.scrollTop = chatMessages.scrollHeight;
         searchInput.value = '';
         searchResults.innerHTML = '';
@@ -114,6 +160,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 300);
     });
 
-    // Initial setup
+    cancelReplyButton.addEventListener('click', cancelReply);
+
+    // Handle Escape key to cancel reply
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && replyingToMessage) {
+            cancelReply();
+        }
+    });
+
+    // Initial focus
     searchInput.focus();
 });
