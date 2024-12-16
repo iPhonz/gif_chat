@@ -1,5 +1,5 @@
 // Configuration
-const TENOR_API_KEY = 'YOUR_API_KEY_HERE'; // Replace with actual API key in production
+const TENOR_API_KEY = 'AIzaSyCkJ44bhL93TkK7MeyBUpfEo53FngnI1lU'; // Replace with actual API key in production
 const API_BASE_URL = 'https://tenor.googleapis.com/v2';
 
 // DOM Elements
