@@ -8,10 +8,15 @@
 </head>
 <body>
     <div class="container">
-        <div class="chat-container" id="chatContainer"></div>
-        <div class="search-container">
-            <input type="text" id="searchInput" placeholder="Search for a GIF...">
-            <div class="gif-results" id="gifResults"></div>
+        <div id="chatArea" class="chat-area">
+            <div id="chatMessages" class="chat-messages"></div>
+        </div>
+        <div class="sidebar">
+            <div class="search-area">
+                <input type="text" id="searchInput" placeholder="Search for a GIF..." class="search-input">
+                <div id="loadingIndicator" class="loading-indicator hidden">Searching...</div>
+            </div>
+            <div id="searchResults" class="search-results"></div>
         </div>
     </div>
     <script src="app.js"></script>
